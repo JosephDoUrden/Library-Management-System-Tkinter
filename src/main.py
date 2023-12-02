@@ -1,20 +1,22 @@
 import tkinter as tk
 from tkinter import ttk
+from components.centerscreen import center_screen_geometry
 
 win = tk.Tk()
 
 win.title("Library Management System")
 
-def center_secreen_geometry(screen_width, screen_height, window_width, window_height):
-    x = int((screen_width / 2) - (window_width / 2))
-    y = int((screen_height / 2) - (window_height / 2))
 
-    return f"{window_width}x{window_height}+{x}+{y}"
+# Set the window to center of the screen
+win.geometry(center_screen_geometry(
+    screen_width=win.winfo_screenwidth(), 
+    screen_height=win.winfo_screenheight(), 
+    win_width=600, 
+    win_height=300
+    ))
 
-win.geometry(center_secreen_geometry(screen_width = win.winfo_screenwidth(),
-                                    screen_height= win.winfo_screenheight(),
-                                    window_width=400,
-                                    window_height=400))
+
+#TODO: Login Page ilgili yere taşınacak aşağıdaki kodlar temsilidir!
 
 # create a label
 label1 = ttk.Label(win, text="Username: ")
