@@ -1,41 +1,42 @@
 import tkinter as tk
-from tkinter import ttk
+from screens.login_screen import LoginScreen
 from components.centerscreen import center_screen_geometry
 
-win = tk.Tk()
+class LibraryManagementApp(tk.Tk):
+    def __init__(self):
+        super().__init__()
+        self.title("Library Management System")
+        # Set the window to center of the screen
+        self.geometry(center_screen_geometry(
+            screen_width=self.winfo_screenwidth(), 
+            screen_height=self.winfo_screenheight(), 
+            win_width=800, 
+            win_height=600
+            ))
 
-win.title("Library Management System")
+        # Dil seçeneği (varsayılan İngilizce)
+        self.language = "en"
+        
+        # Dil seçeneğini yükle
+        self.load_language()
 
+        # Başlangıç ekranı
+        self.login_screen = LoginScreen(self)
+        self.login_screen.pack(expand=True, fill="both")
 
-# Set the window to center of the screen
-win.geometry(center_screen_geometry(
-    screen_width=win.winfo_screenwidth(), 
-    screen_height=win.winfo_screenheight(), 
-    win_width=600, 
-    win_height=300
-    ))
+    def load_language(self):
+        # Dil dosyasını yükle
+        try:
+            with open(f"lang/{self.language}.json", "r", encoding="utf-8") as file:
+                self.language_data = json.load(file)
+        except FileNotFoundError:
+            print(f"Language file not found: {self.language}.json")
+            self.language_data = {}
 
+    def change_language(self, language_code):
+        self.language = language_code
+        self.load_language()
 
-#TODO: Login Page ilgili yere taşınacak aşağıdaki kodlar temsilidir!
-
-# create a label
-label1 = ttk.Label(win, text="Username: ")
-label2 = ttk.Label(win, text="Password: ")
-
-# create a entry
-entry1 = ttk.Entry(win, width=25)
-entry2 = ttk.Entry(win, width=25)
-
-# create a button
-button1 = ttk.Button(win, text="Login")
-
-# grid system
-label1.grid(row=0, column=0, padx=10, pady=10)
-label2.grid(row=1, column=0, padx=10, pady=10)
-entry1.grid(row=0, column=1, padx=10, pady=10)
-entry2.grid(row=1, column=1, padx=10, pady=10)
-button1.grid(row=2, column=1, padx=10, pady=10)
-
-
-
-win.mainloop()
+if __name__ == "__main__":
+    app = LibraryManagementApp()
+    app.mainloop()
