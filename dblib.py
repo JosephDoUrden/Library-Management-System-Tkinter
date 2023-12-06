@@ -1,23 +1,27 @@
 import sqlite3
 
-class GradeBookManager:
+#TODO: role = IsAdmin (boolean) user=false admin=true
+
+class UserDataManager:
     def __init__(self):
         self.conn = None
         self.cur = None
 
     @staticmethod
     def get_connection():
-        return sqlite3.connect("gradebook.db")
+        return sqlite3.connect("userDatabase.db")
 
     def create_database(self):
         self.conn = self.get_connection()
         self.cur = self.conn.cursor()
         self.cur.execute("""
-        create table GradeBook (
+        create table UserData (
             gid   integer primary key autoincrement,
-            fname text,
-            lname text,
-            grade integer
+            role text NOT NULL,
+            username text NOT NULL,
+            password text NOT NULL,
+            email text,
+            phone integer
         );
         """)
         self.conn.commit()
@@ -26,21 +30,14 @@ class GradeBookManager:
     def fill_database(self):
         self.conn = self.get_connection()
         self.cur = self.conn.cursor()
-        data = [('Melissa', 'Bishop', 70),
-                ('Linda', 'Scanlon', 55),
-                ('Russel', 'Gruver', 60),
-                ('Maria', 'Mayes', 100),
-                ('Dennis', 'Hill', 95),
-                ('Nathan', 'Martin', 40),
-                ('William', 'Biggs', 85),
-                ('Lois', 'Ballard', 60),
-                ('Larry', 'Manning', 50),
-                ('Dustin', 'Smalls', 30),
-                ('Alice', 'Lucas', 70),
-                ('John', 'Howell', 90)]
+        data = [('user','yusufhan', 'yusufhan123', 'yusufhan@gmail.com', 11111111111),
+                ('user','elif', 'elif123', 'elif1@gmail.com', 22222222222),
+                ('user','russelG', 'russel12', 'russelG@yahoo.com', 0000000000),
+                ('user','maria', 'mari3', 'maria@gmail.com', 66666666666),
+                ('admin','admin', 'admin123', 'admin@gmail.com',11111111112)]
 
         for item in data:
-            self.cur.execute("insert into GradeBook(fname, lname, grade) values(?, ?, ?)", item)
+            self.cur.execute("insert into UserData(role, username, password, email, phone) values(?, ?, ?, ?, ?)", item)
 
         self.conn.commit()
         self.conn.close()
@@ -48,45 +45,48 @@ class GradeBookManager:
     def clear_database(self):
         self.conn = self.get_connection()
         self.cur = self.conn.cursor()
-        self.cur.execute("delete from GradeBook")
+        self.cur.execute("delete from UserData")
         self.conn.commit()
         self.conn.close()
 
-    def add_grade(self, fname, lname, grade):
+    def add_user(self, role, username, password, email, phone):
         self.conn = self.get_connection()
         self.cur = self.conn.cursor()
-        self.cur.execute("insert into GradeBook(fname, lname, grade) values(:first, :last, :grade)",
-                    {"first": fname,
-                     "last": lname,
-                     "grade": grade})
+        self.cur.execute("insert into UserData(role, username, password, email, phone) values(:role, :username, :password, :email, :phone)",
+                    {"role": role,
+                     "username": username,
+                     "password": password,
+                     "email": email,
+                     "phone": phone})
         self.conn.commit()
         self.conn.close()
 
-    def list_grades(self):
+    def list_users(self):
         self.conn = self.get_connection()
         self.cur = self.conn.cursor()
-        self.cur.execute("select * from GradeBook")
-        grades = self.cur.fetchall()
+        self.cur.execute("select * from UserData")
+        users = self.cur.fetchall()
         self.conn.close()
-        return grades
+        return users
 
+    #TODO: change the info button message
     def get_stats(self):
         self.conn = self.get_connection()
         self.cur = self.conn.cursor()
-        self.cur.execute("select count(*), avg(grade) from GradeBook")
+        self.cur.execute("select count(*), avg(user) from UserData")
         stats = self.cur.fetchone()
         self.conn.close()
         return stats
 
-    def delete_grade(self, gid):
+    def delete_user(self, gid):
         self.conn = self.get_connection()
         self.cur = self.conn.cursor()
-        self.cur.execute("delete from GradeBook where gid=?", [gid])
+        self.cur.execute("delete from UserData where gid=?", [gid])
         self.conn.commit()
 
-    def edit_grade(self, gid, fname, lname, grade):
+    def edit_user(self, gid, role, username, password, email, phone):
         self.conn = self.get_connection()
         self.cur = self.conn.cursor()
-        self.cur.execute("update GradeBook set fname=?, lname=?, grade=? where gid=?",
-                         [fname, lname, grade, gid])
+        self.cur.execute("update UserData set role=?, username=?, password=?, email=?, phone=? where gid=?",
+                         [role, username, password, email, phone, gid])
         self.conn.commit()
