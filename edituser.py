@@ -5,43 +5,41 @@ import sqlite3
 import dblib
 
 
-class AddNew(tk.Toplevel):
-    def __init__(self, parent):
+class EditUser(tk.Toplevel):
+    def __init__(self, parent, rowid, gid, role, username, password, email, phone):
         super().__init__()
         self.db = dblib.UserDataManager()
         self.parent = parent
         self.geometry("400x280+710+290")
-        self.title("Add New User")
+        self.title(f"{role} - {username}")
         self.iconbitmap("python.ico")
+        self.resizable(False, False)
 
-        self.username = tk.StringVar()
-        self.password = tk.StringVar()
-        self.role = tk.StringVar()
-        self.email = tk.StringVar()
-        self.phone = tk.IntVar()
+        self.username = tk.StringVar(value=username)
+        self.password = tk.StringVar(value=password)
+        self.role = tk.StringVar(value=role)
+        self.email = tk.StringVar(value=email)
+        self.phone = tk.IntVar(value=phone)
+
+        self.gid = gid
+        self.rowid = rowid  # ID of the Treeview item that is currently being edited.
 
         self.create_widgets()
         self.txt_username.focus_set()
         self.protocol("WM_DELETE_WINDOW", self.close_window)
 
-    def save_user(self):
+    def update_values(self):
         try:
-            self.db.add_user(role=self.role.get(), username=self.username.get(), password=self.password.get(), email=self.email.get(), phone=self.phone.get())
-            msg.showinfo("Done", "User saved.")
-            self.clear_text_boxes()
-            self.txt_username.focus_set()
+            # Update the recorded values in the database.
+            self.db.edit_user(gid=self.gid, role=self.role.get(), username=self.username.get(), password=self.password.get(), email=self.email.get(), phone=self.phone.get())
+            # Update the values of the selected Treeview row that is in the parent window.
+            self.parent.tv.item(self.rowid, values=(self.gid, self.role.get(), self.username.get(), self.password.get(), self.email.get(), self.phone.get()))
+            self.close_window()
         except (tk.TclError, sqlite3.Error) as err:
-            msg.showerror(title=self.parent.window_title, message="Failed to save new user.\n" + str(err))
-
-    def clear_text_boxes(self):
-        self.txt_username.delete(0, "end")
-        self.txt_password.delete(0, "end")
-        self.txt_role.delete(0, "end")
-        self.txt_email.delete(0, "end")
-        self.txt_phone.delete(0, "end")
+            msg.showerror(title="Error", message="Failed to update changes.\n" + str(err))
 
     def create_widgets(self):
-        self.lbl_username = ttk.Label(self, text="UserName")
+        self.lbl_username = ttk.Label(self, text="Username")
         self.lbl_username.grid(column=0, row=0, padx=15, pady=15, sticky="w")
 
         self.lbl_password = ttk.Label(self, text="Password")
@@ -71,9 +69,8 @@ class AddNew(tk.Toplevel):
         self.txt_phone = ttk.Entry(self, textvariable=self.phone, width=35)
         self.txt_phone.grid(column=1, row=4, padx=(0, 15), pady=(0, 15))
 
-        self.btn_save = ttk.Button(self, text="Save User", command=self.save_user)
-        self.btn_save.grid(column=0, row=5, columnspan=2, pady=(0, 15), sticky="e")
+        self.btn_update = ttk.Button(self, text="Update", command=self.update_values)
+        self.btn_update.grid(column=0, row=5, columnspan=2, pady=(0, 15), sticky="e")
 
     def close_window(self):
-        self.parent.deiconify()
         self.destroy()
