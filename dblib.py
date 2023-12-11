@@ -90,3 +90,12 @@ class UserDataManager:
         self.cur.execute("update UserData set role=?, username=?, password=?, email=?, phone=? where gid=?",
                          [role, username, password, email, phone, gid])
         self.conn.commit()
+    
+    def user_check(self, uname, password):
+        self.conn = self.get_connection()
+        self.cur = self.conn.cursor()
+        self.cur.execute("select role, username, password from UserData where username=? and password=?",
+                          [uname, password])
+        user = self.cur.fetchone()
+        self.conn.close()
+        return user

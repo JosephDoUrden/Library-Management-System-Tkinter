@@ -1,6 +1,9 @@
 import tkinter as tk
 from tkinter import ttk
+from tkinter import messagebox as msg
 import AdminWindow
+import UserWindow
+import dblib
 
 class MainWindow:
     def __init__(self):
@@ -8,10 +11,13 @@ class MainWindow:
        self.win.title("Login Window")
        self.win.geometry("300x300")
        self.win.iconbitmap("python.ico")
+
        self.win2 = None
        self.lbl1 = None
        self.btn1 = None
        self.btn2 = None
+
+       self.db = dblib.UserDataManager()
        self.create_widgets()
 
     def create_widgets(self):
@@ -35,8 +41,23 @@ class MainWindow:
         self.btn2.grid(row=4, column=0, pady=10, columnspan=2, sticky="e")
 
     def open_new_window(self):
-        self.win2 = AdminWindow.AdminWindow(self)
-        self.win2.grab_set()
+        username = self.entryUsername.get()
+        password = self.entryPassword.get()
+
+        user = self.db.user_check(username, password)
+        
+        if user:  # user[0] = role, user[1]=uname, user[2]=password
+            if str(user[0]) == 'user':
+                self.win2 = UserWindow.UserWindow(self)
+            elif str(user[0]) == 'admin':
+                self.win2 = AdminWindow.AdminWindow(self)
+                
+            self.win2.grab_set()
+        else:
+            msg.showerror(title="Error", message="Incorrect username or password")
+            
+            
+
     
     
 
