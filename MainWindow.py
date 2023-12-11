@@ -19,6 +19,7 @@ class MainWindow:
 
        self.db = dblib.UserDataManager()
        self.create_widgets()
+       self.bind_widgets()
 
     def create_widgets(self):
         self.lbl1 = ttk.Label(self.win, text="Login", font=("Calibri", 16))
@@ -40,12 +41,19 @@ class MainWindow:
         self.btn2 = ttk.Button(self.win, text="Close", command=self.win.destroy)
         self.btn2.grid(row=4, column=0, pady=10, columnspan=2, sticky="e")
 
+    def bind_widgets(self):
+        self.entryPassword.bind("<Return>", self.open_new_window_bind)
+    
+    def open_new_window_bind(self, event):
+        self.open_new_window()
+
+
     def open_new_window(self):
         username = self.entryUsername.get()
         password = self.entryPassword.get()
 
         user = self.db.user_check(username, password)
-        
+
         if user:  # user[0] = role, user[1]=uname, user[2]=password
             if str(user[0]) == 'user':
                 self.win2 = UserWindow.UserWindow(self)

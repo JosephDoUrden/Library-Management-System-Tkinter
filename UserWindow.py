@@ -29,7 +29,6 @@ class UserWindow(tk.Toplevel):
         ttk.Label(tab2).grid(column = 0, row = 0, padx = 30, pady = 30) 
 
     def close_window(self):
-        print("Close Window")
         self.destroy()
     
     
