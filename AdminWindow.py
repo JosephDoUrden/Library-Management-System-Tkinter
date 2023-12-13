@@ -63,7 +63,6 @@ class AdminWindow(tk.Toplevel):
         self.user_list.grab_set()
 
     def close_window(self):
-        print("Close Window")
         self.destroy()
 
 

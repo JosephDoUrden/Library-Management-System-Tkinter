@@ -69,15 +69,6 @@ class UserDataManager:
         self.conn.close()
         return users
 
-    #TODO: change the info button message
-    def get_stats(self):
-        self.conn = self.get_connection()
-        self.cur = self.conn.cursor()
-        self.cur.execute("select count(*), avg(user) from UserData")
-        stats = self.cur.fetchone()
-        self.conn.close()
-        return stats
-
     def delete_user(self, gid):
         self.conn = self.get_connection()
         self.cur = self.conn.cursor()
@@ -90,3 +81,21 @@ class UserDataManager:
         self.cur.execute("update UserData set role=?, username=?, password=?, email=?, phone=? where gid=?",
                          [role, username, password, email, phone, gid])
         self.conn.commit()
+    
+    def user_check(self, uname, password):
+        self.conn = self.get_connection()
+        self.cur = self.conn.cursor()
+        self.cur.execute("select role, username, password from UserData where username=? and password=?",
+                          [uname, password])
+        user = self.cur.fetchone()
+        self.conn.close()
+        return user
+    
+    def user_detail(self, username):
+        self.conn = self.get_connection()
+        self.cur = self.conn.cursor()
+        self.cur.execute("select * from UserData where username=?", [username])
+        user = self.cur.fetchone()
+        self.conn.close()
+        return user
+
