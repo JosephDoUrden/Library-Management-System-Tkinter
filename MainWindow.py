@@ -9,7 +9,7 @@ class MainWindow:
     def __init__(self):
        self.win = tk.Tk()
        self.win.title("Login Window")
-       self.win.geometry("300x300")
+       self.win.geometry("300x300+400+200")
        self.win.iconbitmap("python.ico")
 
        self.win2 = None
@@ -40,6 +40,7 @@ class MainWindow:
 
         self.btn2 = ttk.Button(self.win, text="Close", command=self.win.destroy)
         self.btn2.grid(row=4, column=0, pady=10, columnspan=2, sticky="e")
+        
 
     def bind_widgets(self):
         self.entryPassword.bind("<Return>", self.open_new_window_bind)
@@ -56,7 +57,9 @@ class MainWindow:
 
         if user:  # user[0] = role, user[1]=uname, user[2]=password
             if str(user[0]) == 'user':
-                self.win2 = UserWindow.UserWindow(self)
+                self.shared_var = tk.StringVar()
+                self.shared_var = user[1]
+                self.win2 = UserWindow.UserWindow(self, self.shared_var)
             elif str(user[0]) == 'admin':
                 self.win2 = AdminWindow.AdminWindow(self)
                 

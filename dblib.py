@@ -69,15 +69,6 @@ class UserDataManager:
         self.conn.close()
         return users
 
-    #TODO: change the info button message
-    def get_stats(self):
-        self.conn = self.get_connection()
-        self.cur = self.conn.cursor()
-        self.cur.execute("select count(*), avg(user) from UserData")
-        stats = self.cur.fetchone()
-        self.conn.close()
-        return stats
-
     def delete_user(self, gid):
         self.conn = self.get_connection()
         self.cur = self.conn.cursor()
@@ -99,3 +90,12 @@ class UserDataManager:
         user = self.cur.fetchone()
         self.conn.close()
         return user
+    
+    def user_detail(self, username):
+        self.conn = self.get_connection()
+        self.cur = self.conn.cursor()
+        self.cur.execute("select * from UserData where username=?", [username])
+        user = self.cur.fetchone()
+        self.conn.close()
+        return user
+
