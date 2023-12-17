@@ -4,13 +4,12 @@ from tkinter import messagebox as msg
 import sqlite3
 import dblib
 
-
 class AddNew(tk.Toplevel):
     def __init__(self, parent):
         super().__init__()
         self.db = dblib.UserDataManager()
         self.parent = parent
-        self.geometry("400x280+710+290")
+        self.geometry("400x300+710+200")
         self.title("Add New User")
         self.iconbitmap("python.ico")
 
@@ -21,15 +20,29 @@ class AddNew(tk.Toplevel):
         self.phone = tk.IntVar()
 
         self.create_widgets()
+        self.bind_widgets()
         self.txt_username.focus_set()
         self.protocol("WM_DELETE_WINDOW", self.close_window)
 
     def save_user(self):
         try:
-            self.db.add_user(role=self.role.get(), username=self.username.get(), password=self.password.get(), email=self.email.get(), phone=self.phone.get())
-            msg.showinfo("Done", "User saved.")
-            self.clear_text_boxes()
-            self.txt_username.focus_set()
+            if len(self.username.get()) == 0:
+               msg.showerror(title="Error", message="Please enter a valid username.")
+            elif self.db.user_detail(self.username.get()) is not None:
+                msg.showerror(title="Error", message="Username already exist.")
+            elif len(self.password.get()) == 0:
+                msg.showerror(title="Error", message="Please enter a valid password.")
+            elif len(self.role.get()) == 0:
+                msg.showerror(title="Error", message="Please enter a valid role.")
+            elif len(self.email.get()) == 0:
+                msg.showerror(title="Error", message="Please enter a valid email.")
+            elif len(self.phone.get()) == 0:
+                msg.showerror(title="Error", message="Please enter a valid number of phone number.")
+            else:
+                self.db.add_user(role=self.role.get(), username=self.username.get(), password=self.password.get(), email=self.email.get(), phone=self.phone.get())
+                msg.showinfo("Done", "User saved.")
+                self.clear_text_boxes()
+                self.txt_username.focus_set()
         except (tk.TclError, sqlite3.Error) as err:
             msg.showerror(title=self.parent.window_title, message="Failed to save new user.\n" + str(err))
 
@@ -73,6 +86,9 @@ class AddNew(tk.Toplevel):
 
         self.btn_save = ttk.Button(self, text="Save User", command=self.save_user)
         self.btn_save.grid(column=0, row=5, columnspan=2, pady=(0, 15), sticky="e")
+
+    def bind_widgets(self):
+        self.phone.bind("<Return>", self.save_user)
 
     def close_window(self):
         self.parent.deiconify()

@@ -1,7 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox as msg
-import sqlite3
 import dblib
 
 class UserWindow(tk.Toplevel):
@@ -12,6 +11,7 @@ class UserWindow(tk.Toplevel):
         self.geometry("500x300+710+200")
         self.iconbitmap("python.ico")
 
+        self.win3 = None
         self.shared_var = shared_var
         self.current_user = self.get_user_info()
 
@@ -30,9 +30,10 @@ class UserWindow(tk.Toplevel):
         self.tabControl.add(tab3, text ='Profile')
 
         # Widgets for Library
-        # Widgets for My Books
-        # Widgets for Profile 
 
+        # Widgets for My Books
+
+        # Widgets for Profile 
         data_username = tk.StringVar()
         data_role = tk.StringVar()
         data_email = tk.StringVar()
@@ -45,7 +46,8 @@ class UserWindow(tk.Toplevel):
         profile_phone = ttk.Label(tab3, text="Phone Number: " + str(self.current_user[5]))
         profile_book_count = ttk.Label(tab3, text="Book Count: ")
         
-        
+        self.change_password_btn = ttk.Button(tab3, text="Change Password", command=self.change_password)
+        self.change_password_btn.grid(column=0, row=5, pady=10, columnspan=2, sticky="e")
 
         profile_username.grid(column = 0, row = 0, padx = 15, pady = 10, sticky="w")
         profile_role.grid(column = 0, row = 1, padx = 15, pady = 10, sticky="w")
@@ -58,6 +60,8 @@ class UserWindow(tk.Toplevel):
     def get_user_info(self):
         return dblib.UserDataManager().user_detail(self.shared_var)
     
+    def change_password(self):
+        self.win3 = ChangePasswordWindow.ChangePasswordWindow(self)
 
     def close_window(self):
         self.destroy()

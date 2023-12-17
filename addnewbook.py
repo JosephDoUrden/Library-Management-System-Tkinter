@@ -3,6 +3,7 @@ from tkinter import ttk
 from tkinter import messagebox as msg
 import sqlite3
 import bookdb
+import datetime
 
 
 class AddNewBook(tk.Toplevel):
@@ -10,7 +11,7 @@ class AddNewBook(tk.Toplevel):
         super().__init__()
         self.db = bookdb.BookManager()
         self.parent = parent
-        self.geometry("400x300+400+200")
+        self.geometry("400x300+710+200")
         self.title("Add New Book")
         self.iconbitmap("python.ico")
 
@@ -23,17 +24,49 @@ class AddNewBook(tk.Toplevel):
         self.total_copies = tk.IntVar()
 
         self.create_widgets()
+        self.bind_widgets()
         self.txt_title.focus_set()
         self.protocol("WM_DELETE_WINDOW", self.close_window)
 
-    def save_book(self):
+    def is_valid_isbn_13(self, isbn):
+        if not isbn.isdigit() or len(isbn) != 13:
+            return False
+
+        # ISBN-13 algoritması
+        total = 0
+        for i in range(12):
+            digit = int(isbn[i])
+            total += digit * (1 if i % 2 == 0 else 3)
+
+        check_digit = (10 - (total % 10)) % 10
+        return int(isbn[12]) == check_digit
+
+    def save_book(self):        
+        today = datetime.date.today()
+        year = today.year
+
         try:
-            self.db.add_book(title=self.title.get(), author=self.author.get(), genre=self.genre.get(), publication_year=self.publication_year.get(), isbn=self.isbn.get(), available_copies=self.available_copies.get(), total_copies=self.total_copies.get())
-            msg.showinfo("Done", "Book saved.")
-            self.clear_text_boxes()
-            self.txt_title.focus_set()
+            if len(self.title.get()) == 0:
+                msg.showerror(title="Error", message="Please enter a valid title.")
+            elif len(self.author.get()) == 0:
+                msg.showerror(title="Error", message="Please enter a valid author.")
+            elif len(self.genre.get()) == 0:
+                msg.showerror(title="Error", message="Please enter a valid genre.")
+            elif isinstance(self.publication_year.get(), str) or int(self.publication_year.get()) > year or int(self.publication_year.get()) < 0:
+                msg.showerror(title="Error", message="Please enter a valid publication year.")
+            elif not self.is_valid_isbn_13(self.isbn.get()):
+                msg.showerror(title="Error", message="Please enter a valid ISBN.")
+            elif isinstance(self.available_copies.get(), str) or int(self.available_copies.get()) < 0:
+                msg.showerror(title="Error", message="Please enter a valid number of available copies.")
+            elif isinstance(self.total_copies.get(), str) or int(self.total_copies.get()) <= 0:
+                msg.showerror(title="Error", message="Please enter a valid total number of copies.")
+            else:
+                self.db.add_book(title=self.title.get(), author=self.author.get(), genre=self.genre.get(), publication_year=self.publication_year.get(), isbn=self.isbn.get(), available_copies=self.available_copies.get(), total_copies=self.total_copies.get())
+                msg.showinfo("Done", "Book saved.")
+                self.clear_text_boxes()
+                self.txt_title.focus_set()
         except (tk.TclError, sqlite3.Error) as err:
-            msg.showerror(title=self.parent.window_title, message="Failed to save new book.\n" + str(err))
+            msg.showerror(title="Error", message="Failed to save new book.\n" + str(err))
 
     def clear_text_boxes(self):
         self.txt_title.delete(0, "end")
@@ -89,6 +122,9 @@ class AddNewBook(tk.Toplevel):
 
         self.btn_save = ttk.Button(self, text="Save Book", command=self.save_book)
         self.btn_save.grid(column=0, row=7, columnspan=2, pady=(0, 15), sticky="e")
+
+    def bind_widgets(self):
+        self.total_copies.bind("<Return>", self.save_book)
 
     def close_window(self):
         self.parent.deiconify()
