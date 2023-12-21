@@ -22,18 +22,6 @@ class UserList(tk.Toplevel):
     def list_users(self):
         for g in self.db.list_users():
             self.tv.insert(parent="", index="end", values=g)
-    
-    #TODO: delete or keep (info.message)
-    def show_average(self, event):
-        result = self.db.get_stats()
-
-        if result[0] == 0:  # Check the total number of users
-            msg_content = "The database is empty."
-        else:
-            msg_content = (f"Number of recorded users: {str(result[0])}\n\n"
-                           f"The average: {str(round(result[1], 1))}")
-
-        msg.showinfo(title=self.parent.window_title, message=msg_content)
 
     def delete_user(self, event):
         answer = msg.askyesno(title="Confirm Delete", message="Are you sure you want to delete the selected row(s)?")
@@ -91,7 +79,6 @@ class UserList(tk.Toplevel):
         self.tv_scroll.place(relx=1, rely=0, relheight=1, anchor="ne")
 
     def bind_widgets(self):
-        self.bind("<F1>", self.show_average)  # Show the average when the user presses F1.
         self.tv.bind("<Delete>", self.delete_user)  # Delete the selected Treeview item.
         self.tv.bind("<Double-1>", self.show_edit_window)  # Open the edit window for the selected item.
 

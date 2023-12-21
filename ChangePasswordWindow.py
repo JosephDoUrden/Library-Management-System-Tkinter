@@ -1,15 +1,14 @@
 import tkinter as tk
 from tkinter import ttk
-from userlist import UserList
-from booklist import BookList
-import AdminBookWindow
-import AdminUserWindow
+from tkinter import messagebox as msg
+import dblib
 
-class AdminWindow(tk.Toplevel):
+#TODO düzenlenecek tümü
+class ChangePasswordWindow(tk.Toplevel):
     def __init__(self, parent):
         super().__init__()
         self.parent = parent
-        self.title("Admin")
+        self.title("Change Password")
         self.geometry("250x100+710+290")
         self.iconbitmap("python.ico")
 

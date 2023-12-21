@@ -1,7 +1,5 @@
 import sqlite3
 
-#TODO: role = IsAdmin (boolean) user=false admin=true
-
 class UserDataManager:
     def __init__(self):
         self.conn = None
@@ -16,7 +14,7 @@ class UserDataManager:
         self.cur = self.conn.cursor()
         self.cur.execute("""
         create table UserData (
-            gid   integer primary key autoincrement,
+            id   integer primary key autoincrement,
             role text NOT NULL,
             username text NOT NULL,
             password text NOT NULL,
@@ -72,14 +70,14 @@ class UserDataManager:
     def delete_user(self, gid):
         self.conn = self.get_connection()
         self.cur = self.conn.cursor()
-        self.cur.execute("delete from UserData where gid=?", [gid])
+        self.cur.execute("delete from UserData where id=?", [id])
         self.conn.commit()
 
-    def edit_user(self, gid, role, username, password, email, phone):
+    def edit_user(self, id, role, username, password, email, phone):
         self.conn = self.get_connection()
         self.cur = self.conn.cursor()
-        self.cur.execute("update UserData set role=?, username=?, password=?, email=?, phone=? where gid=?",
-                         [role, username, password, email, phone, gid])
+        self.cur.execute("update UserData set role=?, username=?, password=?, email=?, phone=? where id=?",
+                         [role, username, password, email, phone, id])
         self.conn.commit()
     
     def user_check(self, uname, password):
