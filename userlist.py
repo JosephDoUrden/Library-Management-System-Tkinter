@@ -10,7 +10,7 @@ class UserList(tk.Toplevel):
         super().__init__()
         self.db = dblib.UserDataManager()
         self.parent = parent
-        self.geometry("500x200+710+290")
+        self.geometry("600x200+710+290")
         self.title("User List")
         self.iconbitmap("python.ico")
         

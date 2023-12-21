@@ -19,7 +19,7 @@ class UserDataManager:
             username text NOT NULL,
             password text NOT NULL,
             email text,
-            phone integer
+            phone integer      
         );
         """)
         self.conn.commit()
@@ -92,7 +92,7 @@ class UserDataManager:
     def user_detail(self, username):
         self.conn = self.get_connection()
         self.cur = self.conn.cursor()
-        self.cur.execute("select * from UserData where username=?", [username])
+        self.cur.execute("SELECT * FROM UserData WHERE username=?", (username,))
         user = self.cur.fetchone()
         self.conn.close()
         return user

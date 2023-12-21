@@ -124,7 +124,7 @@ class AddNewBook(tk.Toplevel):
         self.btn_save.grid(column=0, row=7, columnspan=2, pady=(0, 15), sticky="e")
 
     def bind_widgets(self):
-        self.total_copies.bind("<Return>", self.save_book)
+        self.txt_total_copies.bind("<Return>", self.save_book)
 
     def close_window(self):
         self.parent.deiconify()

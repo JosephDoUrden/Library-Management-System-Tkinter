@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox as msg
+import ChangePasswordWindow
 import dblib
 
 class UserWindow(tk.Toplevel):
