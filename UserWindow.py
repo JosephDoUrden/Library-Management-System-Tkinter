@@ -1,7 +1,9 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox as msg
+import ChangePasswordWindow
 import dblib
+import bookdb
 
 class UserWindow(tk.Toplevel):
     def __init__(self, parent, shared_var):
@@ -11,11 +13,11 @@ class UserWindow(tk.Toplevel):
         self.geometry("500x300+710+200")
         self.iconbitmap("python.ico")
 
-        self.win3 = None
         self.shared_var = shared_var
         self.current_user = self.get_user_info()
 
         self.db = dblib.UserDataManager()
+        self.bookdb = bookdb.BookManager()
         self.tabControl = ttk.Notebook(self)
         self.create_widgets()
         self.protocol("WM_DELETE_WINDOW", self.close_window)
@@ -30,6 +32,28 @@ class UserWindow(tk.Toplevel):
         self.tabControl.add(tab3, text ='Profile')
 
         # Widgets for Library
+        library = ttk.Treeview(tab1)
+        library['columns'] = ('id', 'title', 'author', 'genre', 'publication_year', 'status')
+        library.pack(fill="both", expand=True)
+
+        library.column("#0", width=0,  stretch=0)
+        library.column("id",anchor='center', width=80)
+        library.column("title",anchor='center',width=80)
+        library.column("author",anchor='center',width=80)
+        library.column("genre",anchor='center',width=80)
+        library.column("publication_year",anchor='center',width=80)        
+        library.column("status",anchor='center',width=80)
+
+        library.heading("#0",text="",anchor='center')
+        library.heading("id",text="Id",anchor='center')
+        library.heading("title",text="Title",anchor='center')
+        library.heading("author",text="Author",anchor='center')
+        library.heading("genre",text="Genre",anchor='center')
+        library.heading("publication_year",text="Publication Year",anchor='center')
+        library.heading("status",text="Status",anchor='center')
+
+        for book in self.bookdb.list_books():
+            library.insert(parent="", index="end", values=(book[0],book[1],book[2],book[3],book[4], book[5]))
 
         # Widgets for My Books
 
@@ -47,7 +71,7 @@ class UserWindow(tk.Toplevel):
         profile_book_count = ttk.Label(tab3, text="Book Count: ")
         
         self.change_password_btn = ttk.Button(tab3, text="Change Password", command=self.change_password)
-        self.change_password_btn.grid(column=0, row=5, pady=10, columnspan=2, sticky="e")
+        self.change_password_btn.grid(column=0, row=5, padx = 15, pady=10, columnspan=2, sticky="w")  # Align to the left
 
         profile_username.grid(column = 0, row = 0, padx = 15, pady = 10, sticky="w")
         profile_role.grid(column = 0, row = 1, padx = 15, pady = 10, sticky="w")
@@ -61,7 +85,8 @@ class UserWindow(tk.Toplevel):
         return dblib.UserDataManager().user_detail(self.shared_var)
     
     def change_password(self):
-        self.win3 = ChangePasswordWindow.ChangePasswordWindow(self)
+        self.win3 = ChangePasswordWindow.ChangePasswordWindow(self, self.current_user[2])
+
 
     def close_window(self):
         self.destroy()

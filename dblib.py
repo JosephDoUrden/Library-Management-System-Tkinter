@@ -19,7 +19,7 @@ class UserDataManager:
             username text NOT NULL,
             password text NOT NULL,
             email text,
-            phone integer
+            phone integer      
         );
         """)
         self.conn.commit()
@@ -92,8 +92,27 @@ class UserDataManager:
     def user_detail(self, username):
         self.conn = self.get_connection()
         self.cur = self.conn.cursor()
-        self.cur.execute("select * from UserData where username=?", [username])
+        self.cur.execute("SELECT * FROM UserData WHERE username=?", (username,))
         user = self.cur.fetchone()
         self.conn.close()
         return user
+
+    def change_password(self, username, new_password):
+        try:
+            # Check if the user exists
+            user = self.user_detail(username)
+            if user:
+                # Update the user's password
+                self.conn = self.get_connection()
+                self.cur = self.conn.cursor()
+                self.cur.execute("UPDATE UserData SET password=? WHERE username=?", (new_password, username))
+                self.conn.commit()
+                self.conn.close()
+                return True  # Password changed successfully
+            else:
+                return False  # User not found
+        except sqlite3.Error as err:
+            # Handle errors if necessary
+            print("Error:", err)
+            return False
 

@@ -9,7 +9,7 @@ class BookList(tk.Toplevel):
         super().__init__()
         self.db = bookdb.BookManager()
         self.parent = parent
-        self.geometry("900x300+400+200")
+        self.geometry("950x300+400+200")
         self.title("Book Data")
         self.iconbitmap("python.ico")
 
@@ -48,12 +48,13 @@ class BookList(tk.Toplevel):
                                                publication_year=selected_book_row[4],
                                                isbn=selected_book_row[5],
                                                available_copies=selected_book_row[6],
-                                               total_copies=selected_book_row[7])
+                                               total_copies=selected_book_row[7],
+                                               user_id=selected_book_row[8])
         self.edit_selected.grab_set()
 
     def create_widgets(self):
         self.tv = ttk.Treeview(self, height=15, show="headings", selectmode="extended")
-        self.tv["columns"] = ("id", "title", "author", "genre", "publication_year", "isbn", "available_copies", "total_copies")
+        self.tv["columns"] = ("id", "title", "author", "genre", "publication_year", "isbn", "available_copies", "total_copies", "user_id")
         self.tv.pack(fill="both", expand=True)
 
         self.tv.heading("id", text="ID", anchor="center")
@@ -64,9 +65,10 @@ class BookList(tk.Toplevel):
         self.tv.heading("isbn", text="ISBN", anchor="center")
         self.tv.heading("available_copies", text="Available Copies", anchor="center")
         self.tv.heading("total_copies", text="Total Copies", anchor="center")
+        self.tv.heading("user_id", text="User ID", anchor="center")
 
         for col in self.tv["columns"]:
-            self.tv.column(col, anchor="w", width=120)
+            self.tv.column(col, anchor="w", width=100)
 
         self.tv_scroll = ttk.Scrollbar(self, orient="vertical", command=self.tv.yview)
         self.tv.configure(yscrollcommand=self.tv_scroll.set)

@@ -5,7 +5,7 @@ import sqlite3
 import bookdb
 
 class EditBook(tk.Toplevel):
-    def __init__(self, parent, rowid, id, title, author, genre, publication_year, isbn, available_copies, total_copies):
+    def __init__(self, parent, rowid, id, title, author, genre, publication_year, isbn, available_copies, total_copies, user_id):
         super().__init__()
         self.db = bookdb.BookManager()
         self.parent = parent
@@ -22,6 +22,7 @@ class EditBook(tk.Toplevel):
         self.isbn = tk.StringVar(value=isbn)
         self.available_copies = tk.IntVar(value=available_copies)
         self.total_copies = tk.IntVar(value=total_copies)
+        self.user_id = tk.IntVar(value=user_id)
 
         self.id = id
         self.rowid = rowid  # ID of the Treeview item that is currently being edited.
@@ -40,7 +41,8 @@ class EditBook(tk.Toplevel):
                 publication_year=self.publication_year.get(),
                 isbn=self.isbn.get(),
                 available_copies=self.available_copies.get(),
-                total_copies=self.total_copies.get()
+                total_copies=self.total_copies.get(),
+                user_id=self.user_id.get()
             )
             # Update the values of the selected Treeview row that is in the parent window.
             self.parent.tv.item(self.rowid, values=(
@@ -50,7 +52,8 @@ class EditBook(tk.Toplevel):
                 self.publication_year.get(),
                 self.isbn.get(),
                 self.available_copies.get(),
-                self.total_copies.get()
+                self.total_copies.get(),
+                self.user_id.get()
             ))
             msg.showinfo("Success", "Book updated.")
             self.close_window()

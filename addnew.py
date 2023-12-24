@@ -88,7 +88,7 @@ class AddNew(tk.Toplevel):
         self.btn_save.grid(column=0, row=5, columnspan=2, pady=(0, 15), sticky="e")
 
     def bind_widgets(self):
-        self.phone.bind("<Return>", self.save_user)
+        self.txt_phone.bind("<Return>", self.save_user)
 
     def close_window(self):
         self.parent.deiconify()
