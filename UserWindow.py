@@ -10,7 +10,7 @@ class UserWindow(tk.Toplevel):
         super().__init__()
         self.parent = parent
         self.title("User")
-        self.geometry("500x300+710+200")
+        self.geometry("700x300+710+200")
         self.iconbitmap("python.ico")
 
         self.shared_var = shared_var
@@ -19,6 +19,10 @@ class UserWindow(tk.Toplevel):
         self.db = dblib.UserDataManager()
         self.bookdb = bookdb.BookManager()
         self.tabControl = ttk.Notebook(self)
+
+        self.library = None
+        self.my_books = None
+
         self.create_widgets()
         self.protocol("WM_DELETE_WINDOW", self.close_window)
 
@@ -32,30 +36,71 @@ class UserWindow(tk.Toplevel):
         self.tabControl.add(tab3, text ='Profile')
 
         # Widgets for Library
-        library = ttk.Treeview(tab1)
-        library['columns'] = ('id', 'title', 'author', 'genre', 'publication_year', 'status')
-        library.pack(fill="both", expand=True)
+        self.library = ttk.Treeview(tab1)
+        self.library['columns'] = ('id', 'title', 'author', 'genre', 'publication_year', 'isbn', 'status')
+        self.library.pack(fill="both", expand=True)
 
-        library.column("#0", width=0,  stretch=0)
-        library.column("id",anchor='center', width=80)
-        library.column("title",anchor='center',width=80)
-        library.column("author",anchor='center',width=80)
-        library.column("genre",anchor='center',width=80)
-        library.column("publication_year",anchor='center',width=80)        
-        library.column("status",anchor='center',width=80)
+        self.library.column("#0", width=0,  stretch=0)
+        self.library.column("id",anchor='center', width=80)
+        self.library.column("title",anchor='w',width=80)
+        self.library.column("author",anchor='w',width=80)
+        self.library.column("genre",anchor='w',width=80)
+        self.library.column("publication_year",anchor='center',width=80) 
+        self.library.column("isbn",anchor='center',width=80)         
+        self.library.column("status",anchor='w',width=80)
 
-        library.heading("#0",text="",anchor='center')
-        library.heading("id",text="Id",anchor='center')
-        library.heading("title",text="Title",anchor='center')
-        library.heading("author",text="Author",anchor='center')
-        library.heading("genre",text="Genre",anchor='center')
-        library.heading("publication_year",text="Publication Year",anchor='center')
-        library.heading("status",text="Status",anchor='center')
+        self.library.heading("#0",text="",anchor='center')
+        self.library.heading("id",text="Id",anchor='center')
+        self.library.heading("title",text="Title",anchor='center')
+        self.library.heading("author",text="Author",anchor='center')
+        self.library.heading("genre",text="Genre",anchor='center')
+        self.library.heading("publication_year",text="Publication Year",anchor='center')        
+        self.library.heading("isbn",text="ISBN",anchor='center')
+        self.library.heading("status",text="Status",anchor='center')
 
         for book in self.bookdb.list_books():
-            library.insert(parent="", index="end", values=(book[0],book[1],book[2],book[3],book[4], book[5]))
+            self.library.insert(parent="", index="end", values=book)
+        
+        self.library_scroll = ttk.Scrollbar(self, orient="vertical", command=self.library.yview)
+        self.library.configure(yscrollcommand=self.library_scroll.set)
+        self.library_scroll.place(relx=1, rely=0, relheight=1, anchor="ne")
+
+        # Bind the function here
+        self.library.bind("<Double-1>", self.borrow_book)
 
         # Widgets for My Books
+        self.my_books = ttk.Treeview(tab2)
+        self.my_books['columns'] = ('id', 'title', 'author', 'genre', 'publication_year', 'isbn', 'status')
+        self.my_books.pack(fill="both", expand=True)
+
+        self.my_books.column("#0", width=0,  stretch=0)
+        self.my_books.column("id",anchor='center', width=80)
+        self.my_books.column("title",anchor='w',width=80)
+        self.my_books.column("author",anchor='w',width=80)
+        self.my_books.column("genre",anchor='w',width=80)
+        self.my_books.column("publication_year",anchor='center',width=80) 
+        self.my_books.column("isbn",anchor='center',width=80)         
+        self.my_books.column("status",anchor='w',width=80)
+
+        self.my_books.heading("#0",text="",anchor='center')
+        self.my_books.heading("id",text="Id",anchor='center')
+        self.my_books.heading("title",text="Title",anchor='center')
+        self.my_books.heading("author",text="Author",anchor='center')
+        self.my_books.heading("genre",text="Genre",anchor='center')
+        self.my_books.heading("publication_year",text="Publication Year",anchor='center')        
+        self.my_books.heading("isbn",text="ISBN",anchor='center')
+        self.my_books.heading("status",text="Status",anchor='center')
+
+        for book in self.bookdb.get_my_books(self.current_user[0]):
+            self.my_books.insert(parent="", index="end", values=book)
+        
+        self.my_books_scroll = ttk.Scrollbar(self, orient="vertical", command=self.my_books.yview)
+        self.my_books.configure(yscrollcommand=self.my_books_scroll.set)
+        self.my_books_scroll.place(relx=1, rely=0, relheight=1, anchor="ne")
+
+        # Bind the function here
+        self.my_books.bind("<Delete>", self.return_book)
+        self.my_books.bind("<Double-1>", self.return_book)
 
         # Widgets for Profile 
         data_username = tk.StringVar()
@@ -68,7 +113,6 @@ class UserWindow(tk.Toplevel):
         profile_role  = ttk.Label(tab3, text="Role: " + str(self.current_user[1]))
         profile_email = ttk.Label(tab3, text="Email: " + self.current_user[4])
         profile_phone = ttk.Label(tab3, text="Phone Number: " + str(self.current_user[5]))
-        profile_book_count = ttk.Label(tab3, text="Book Count: ")
         
         self.change_password_btn = ttk.Button(tab3, text="Change Password", command=self.change_password)
         self.change_password_btn.grid(column=0, row=5, padx = 15, pady=10, columnspan=2, sticky="w")  # Align to the left
@@ -76,10 +120,27 @@ class UserWindow(tk.Toplevel):
         profile_username.grid(column = 0, row = 0, padx = 15, pady = 10, sticky="w")
         profile_role.grid(column = 0, row = 1, padx = 15, pady = 10, sticky="w")
         profile_email.grid(column = 0, row = 2, padx = 15, pady = 10, sticky="w")
-        profile_phone.grid(column = 0, row = 3, padx = 15, pady = 10, sticky="w")
-        profile_book_count.grid(column = 0, row = 4, padx = 15, pady = 10, sticky="w")        
+        profile_phone.grid(column = 0, row = 3, padx = 15, pady = 10, sticky="w")    
 
         self.tabControl.pack(expand = 1, fill ="both") 
+
+    def borrow_book(self, event):
+        answer = msg.askyesno(title="Confirm Borrow", message="Are you sure you want to borrow the selected book(s)?")
+        if answer:
+            for i in self.library.selection():
+                selected_row = self.library.item(i)["values"]
+                self.bookdb.issue_book(selected_row[0],self.db.user_detail(self.shared_var)[0])
+            self.refresh_library()
+            self.refresh_my_books()
+
+    def return_book(self, event):
+        answer = msg.askyesno(title="Confirm Return", message="Are you sure you want to return the selected book(s)?")
+        if answer:
+            for i in self.my_books.selection():
+                selected_row = self.my_books.item(i)["values"]
+                self.bookdb.return_book(selected_row[0])
+            self.refresh_my_books()
+            self.refresh_library()
 
     def get_user_info(self):
         return dblib.UserDataManager().user_detail(self.shared_var)
@@ -87,11 +148,17 @@ class UserWindow(tk.Toplevel):
     def change_password(self):
         self.win3 = ChangePasswordWindow.ChangePasswordWindow(self, self.current_user[2])
 
+    def refresh_library(self):
+        # Refresh the content of the Library tab
+        self.library.delete(*self.library.get_children())
+        for book in self.bookdb.list_books():
+            self.library.insert(parent="", index="end", values=book)
+
+    def refresh_my_books(self):
+        # Refresh the content of the My Books tab
+        self.my_books.delete(*self.my_books.get_children())
+        for book in self.bookdb.get_my_books(self.current_user[0]):
+            self.my_books.insert(parent="", index="end", values=book)
 
     def close_window(self):
         self.destroy()
-    
-    
-
-    
-

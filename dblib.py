@@ -92,7 +92,7 @@ class UserDataManager:
     def user_detail(self, username):
         self.conn = self.get_connection()
         self.cur = self.conn.cursor()
-        self.cur.execute("SELECT * FROM UserData WHERE username=?", (username,))
+        self.cur.execute("SELECT * FROM UserData WHERE username=?", [username])
         user = self.cur.fetchone()
         self.conn.close()
         return user
