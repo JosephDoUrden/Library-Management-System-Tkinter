@@ -3,34 +3,64 @@ from tkinter import ttk
 from tkinter import messagebox as msg
 import dblib
 
-#TODO düzenlenecek tümü
 class ChangePasswordWindow(tk.Toplevel):
-    def __init__(self, parent):
+    def __init__(self, parent, current_username):
         super().__init__()
         self.parent = parent
+        self.current_username = current_username
         self.title("Change Password")
-        self.geometry("250x100+710+290")
+        self.geometry("250x150+710+290")
         self.iconbitmap("python.ico")
+
+        self.old_password_var = tk.StringVar()
+        self.new_password_var = tk.StringVar()
 
         self.create_widgets()
         self.protocol("WM_DELETE_WINDOW", self.close_window)
+        self.grab_set()  # Set the grab on the ChangePasswordWindow
 
     def create_widgets(self):
-        btn_user_data = ttk.Button(self, text="User Data", width=15, command=self.show_user_data_window)
-        btn_book_data = ttk.Button(self, text="Book Data", width=15, command=self.show_book_data_window)
+        # Old Password
+        lbl_old_password = ttk.Label(self, text="Old Password:")
+        lbl_old_password.grid(column=0, row=0, padx=10, pady=5, sticky="w")
 
-        btn_user_data.pack(pady=(20, 0))
-        btn_book_data.pack(pady=(10, 0))
+        entry_old_password = ttk.Entry(self, textvariable=self.old_password_var, show="*")
+        entry_old_password.grid(column=1, row=0, padx=10, pady=5)
 
-    def show_user_data_window(self):
-        self.withdraw()
-        self.win2 = AdminUserWindow.AdminUserWindow(self)
-        self.win2.grab_set()
+        # New Password
+        lbl_new_password = ttk.Label(self, text="New Password:")
+        lbl_new_password.grid(column=0, row=1, padx=10, pady=5, sticky="w")
 
-    def show_book_data_window(self):
-        self.withdraw()
-        self.win2 = AdminBookWindow.AdminBookWindow(self)
-        self.win2.grab_set()
+        entry_new_password = ttk.Entry(self, textvariable=self.new_password_var, show="*")
+        entry_new_password.grid(column=1, row=1, padx=10, pady=5)
+
+        # Change Password Button
+        btn_change_password = ttk.Button(self, text="Change Password", command=self.change_password)
+        btn_change_password.grid(column=1, row=2, pady=10, sticky="e")
+
+    def change_password(self):
+        old_password = self.old_password_var.get()
+        new_password = self.new_password_var.get()
+
+        if not old_password or not new_password:
+            msg.showerror("Error", "Please enter both old and new passwords.")
+            return
+
+        # Check the old password
+        user_manager = dblib.UserDataManager()
+        user = user_manager.user_check(self.current_username, old_password)
+
+        if user:
+            # Change the password
+            success = user_manager.change_password(self.current_username, new_password)
+            if success:
+                msg.showinfo("Success", "Password changed successfully.")
+                self.close_window()
+            else:
+                msg.showerror("Error", "Failed to change password.")
+        else:
+            msg.showerror("Error", "Incorrect old password.")
 
     def close_window(self):
+        self.grab_release()  # Release the grab
         self.destroy()
