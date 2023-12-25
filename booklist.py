@@ -41,20 +41,19 @@ class BookList(tk.Toplevel):
         selected_book_row = self.tv.item(selected_row_id)["values"]
         self.edit_selected = editbook.EditBook(parent=self,
                                                rowid=selected_row_id,
-                                               book_id=selected_book_row[0],
+                                               bid=selected_book_row[0],
                                                title=selected_book_row[1],
                                                author=selected_book_row[2],
                                                genre=selected_book_row[3],
                                                publication_year=selected_book_row[4],
                                                isbn=selected_book_row[5],
-                                               available_copies=selected_book_row[6],
-                                               total_copies=selected_book_row[7],
-                                               user_id=selected_book_row[8])
+                                               status=selected_book_row[6],
+                                               user_id=selected_book_row[7])
         self.edit_selected.grab_set()
 
     def create_widgets(self):
         self.tv = ttk.Treeview(self, height=15, show="headings", selectmode="extended")
-        self.tv["columns"] = ("id", "title", "author", "genre", "publication_year", "isbn", "available_copies", "total_copies", "user_id")
+        self.tv["columns"] = ("id", "title", "author", "genre", "publication_year", "isbn", "status", "user_id")
         self.tv.pack(fill="both", expand=True)
 
         self.tv.heading("id", text="ID", anchor="center")
@@ -63,8 +62,7 @@ class BookList(tk.Toplevel):
         self.tv.heading("genre", text="Genre", anchor="center")
         self.tv.heading("publication_year", text="Publication Year", anchor="center")
         self.tv.heading("isbn", text="ISBN", anchor="center")
-        self.tv.heading("available_copies", text="Available Copies", anchor="center")
-        self.tv.heading("total_copies", text="Total Copies", anchor="center")
+        self.tv.heading("status", text="Status", anchor="center")
         self.tv.heading("user_id", text="User ID", anchor="center")
 
         for col in self.tv["columns"]:

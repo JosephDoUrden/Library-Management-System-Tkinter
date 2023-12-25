@@ -5,26 +5,24 @@ import sqlite3
 import bookdb
 
 class EditBook(tk.Toplevel):
-    def __init__(self, parent, rowid, id, title, author, genre, publication_year, isbn, available_copies, total_copies, user_id):
+    def __init__(self, parent, rowid, bid, title, author, genre, publication_year, isbn, status, user_id):
         super().__init__()
         self.db = bookdb.BookManager()
         self.parent = parent
-        self.geometry("450x300+400+200")
+        self.geometry("500x400+400+200")
         self.title(f"Edit - {title}")
         self.iconbitmap("python.ico")
         self.resizable(False, False)
 
-        
+        self.bid = tk.IntVar(value=bid)
         self.title = tk.StringVar(value=title)
         self.author = tk.StringVar(value=author)
         self.genre = tk.StringVar(value=genre)
         self.publication_year = tk.IntVar(value=publication_year)
         self.isbn = tk.StringVar(value=isbn)
-        self.available_copies = tk.IntVar(value=available_copies)
-        self.total_copies = tk.IntVar(value=total_copies)
+        self.status = tk.StringVar(value=status)
         self.user_id = tk.IntVar(value=user_id)
 
-        self.id = id
         self.rowid = rowid  # ID of the Treeview item that is currently being edited.
 
         self.create_widgets()
@@ -33,32 +31,43 @@ class EditBook(tk.Toplevel):
 
     def update_values(self):
         try:
+            # Validate the status field
+            valid_statuses = ["Issued", "Available"]
+            entered_status = self.status.get().strip()
+
+            if entered_status not in valid_statuses:
+                msg.showerror(title="Error", message="Please enter a valid status (Issued or Available).")
+                return
+
             # Update the recorded values in the database.
             self.db.edit_book(
+                bid=self.bid.get(),
                 title=self.title.get(),
                 author=self.author.get(),
                 genre=self.genre.get(),
                 publication_year=self.publication_year.get(),
                 isbn=self.isbn.get(),
-                available_copies=self.available_copies.get(),
-                total_copies=self.total_copies.get(),
+                status=entered_status,
                 user_id=self.user_id.get()
             )
+
             # Update the values of the selected Treeview row that is in the parent window.
             self.parent.tv.item(self.rowid, values=(
+                self.bid.get(),
                 self.title.get(),
                 self.author.get(),
                 self.genre.get(),
                 self.publication_year.get(),
                 self.isbn.get(),
-                self.available_copies.get(),
-                self.total_copies.get(),
+                entered_status,
                 self.user_id.get()
             ))
+
             msg.showinfo("Success", "Book updated.")
             self.close_window()
         except (tk.TclError, sqlite3.Error) as err:
             msg.showerror(title="Error", message="Failed to update changes.\n" + str(err))
+
 
     def create_widgets(self):
         self.lbl_title = ttk.Label(self, text="Title")
@@ -76,11 +85,11 @@ class EditBook(tk.Toplevel):
         self.lbl_isbn = ttk.Label(self, text="ISBN")
         self.lbl_isbn.grid(column=0, row=4, padx=15, pady=(0, 15), sticky="w")
 
-        self.lbl_available_copies = ttk.Label(self, text="Available Copies")
-        self.lbl_available_copies.grid(column=0, row=5, padx=15, pady=(0, 15), sticky="w")
+        self.lbl_status = ttk.Label(self, text="Status")
+        self.lbl_status.grid(column=0, row=5, padx=15, pady=(0, 15), sticky="w")
 
-        self.lbl_total_copies = ttk.Label(self, text="Total Copies")
-        self.lbl_total_copies.grid(column=0, row=6, padx=15, pady=(0, 15), sticky="w")
+        self.lbl_status = ttk.Label(self, text="Issued By")
+        self.lbl_status.grid(column=0, row=6, padx=15, pady=(0, 15), sticky="w")
 
         self.txt_title = ttk.Entry(self, textvariable=self.title, width=35)
         self.txt_title.grid(column=1, row=0, padx=(0, 15), pady=15)
@@ -97,11 +106,11 @@ class EditBook(tk.Toplevel):
         self.txt_isbn = ttk.Entry(self, textvariable=self.isbn, width=35)
         self.txt_isbn.grid(column=1, row=4, padx=(0, 15), pady=(0, 15))
 
-        self.txt_available_copies = ttk.Entry(self, textvariable=self.available_copies, width=35)
-        self.txt_available_copies.grid(column=1, row=5, padx=(0, 15), pady=(0, 15))
+        self.txt_status = ttk.Entry(self, textvariable=self.status, width=35)
+        self.txt_status.grid(column=1, row=5, padx=(0, 15), pady=(0, 15))
 
-        self.txt_total_copies = ttk.Entry(self, textvariable=self.total_copies, width=35)
-        self.txt_total_copies.grid(column=1, row=6, padx=(0, 15), pady=(0, 15))
+        self.txt_user_id = ttk.Entry(self, textvariable=self.user_id, width=35)
+        self.txt_user_id.grid(column=1, row=6, padx=(0, 15), pady=(0, 15))
 
         self.btn_update = ttk.Button(self, text="Update Book", command=self.update_values)
         self.btn_update.grid(column=0, row=7, columnspan=2, pady=(0, 15), sticky="e")

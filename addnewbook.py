@@ -20,8 +20,7 @@ class AddNewBook(tk.Toplevel):
         self.genre = tk.StringVar()
         self.publication_year = tk.IntVar()
         self.isbn = tk.StringVar()
-        self.available_copies = tk.IntVar()
-        self.total_copies = tk.IntVar()
+        self.status = tk.StringVar()
 
         self.create_widgets()
         self.bind_widgets()
@@ -56,12 +55,10 @@ class AddNewBook(tk.Toplevel):
                 msg.showerror(title="Error", message="Please enter a valid publication year.")
             elif not self.is_valid_isbn_13(self.isbn.get()):
                 msg.showerror(title="Error", message="Please enter a valid ISBN.")
-            elif isinstance(self.available_copies.get(), str) or int(self.available_copies.get()) < 0:
-                msg.showerror(title="Error", message="Please enter a valid number of available copies.")
-            elif isinstance(self.total_copies.get(), str) or int(self.total_copies.get()) <= 0:
-                msg.showerror(title="Error", message="Please enter a valid total number of copies.")
+            elif len(self.status.get()) == 0 and (self.status.get() != "Issued" or self.status.get() != "Available"):
+                msg.showerror(title="Error", message="Please enter a valid status.")
             else:
-                self.db.add_book(title=self.title.get(), author=self.author.get(), genre=self.genre.get(), publication_year=self.publication_year.get(), isbn=self.isbn.get(), available_copies=self.available_copies.get(), total_copies=self.total_copies.get())
+                self.db.add_book(title=self.title.get(), author=self.author.get(), genre=self.genre.get(), publication_year=self.publication_year.get(), isbn=self.isbn.get(), status=self.status.get())
                 msg.showinfo("Done", "Book saved.")
                 self.clear_text_boxes()
                 self.txt_title.focus_set()
@@ -74,8 +71,7 @@ class AddNewBook(tk.Toplevel):
         self.txt_genre.delete(0, "end")
         self.txt_publication_year.delete(0, "end")
         self.txt_isbn.delete(0, "end")
-        self.txt_available_copies.delete(0, "end")
-        self.txt_total_copies.delete(0, "end")
+        self.txt_status.delete(0, "end")
 
     def create_widgets(self):
         self.lbl_title = ttk.Label(self, text="Title")
@@ -114,17 +110,14 @@ class AddNewBook(tk.Toplevel):
         self.txt_isbn = ttk.Entry(self, textvariable=self.isbn, width=35)
         self.txt_isbn.grid(column=1, row=4, padx=(0, 15), pady=(0, 15))
 
-        self.txt_available_copies = ttk.Entry(self, textvariable=self.available_copies, width=35)
-        self.txt_available_copies.grid(column=1, row=5, padx=(0, 15), pady=(0, 15))
-
-        self.txt_total_copies = ttk.Entry(self, textvariable=self.total_copies, width=35)
-        self.txt_total_copies.grid(column=1, row=6, padx=(0, 15), pady=(0, 15))
+        self.txt_status = ttk.Entry(self, textvariable=self.status, width=35)
+        self.txt_status.grid(column=1, row=5, padx=(0, 15), pady=(0, 15))
 
         self.btn_save = ttk.Button(self, text="Save Book", command=self.save_book)
         self.btn_save.grid(column=0, row=7, columnspan=2, pady=(0, 15), sticky="e")
 
     def bind_widgets(self):
-        self.txt_total_copies.bind("<Return>", self.save_book)
+        self.txt_status.bind("<Return>", self.save_book)
 
     def close_window(self):
         self.parent.deiconify()
