@@ -4,11 +4,14 @@ from userlist import UserList
 from booklist import BookList
 import AdminBookWindow
 import AdminUserWindow
+import langpack
 
 class AdminWindow(tk.Toplevel):
-    def __init__(self, parent):
+    def __init__(self, parent, selected_language):
         super().__init__()
         self.parent = parent
+        self.selected_language = selected_language
+        self.i18n = langpack.I18N(self.selected_language)
         self.title("Admin")
         self.geometry("250x100+710+290")
         self.iconbitmap("python.ico")
@@ -25,12 +28,12 @@ class AdminWindow(tk.Toplevel):
 
     def show_user_data_window(self):
         self.withdraw()
-        self.win2 = AdminUserWindow.AdminUserWindow(self)
+        self.win2 = AdminUserWindow.AdminUserWindow(self, self.selected_language)
         self.win2.grab_set()
 
     def show_book_data_window(self):
         self.withdraw()
-        self.win2 = AdminBookWindow.AdminBookWindow(self)
+        self.win2 = AdminBookWindow.AdminBookWindow(self, self.selected_language)
         self.win2.grab_set()
 
     def close_window(self):

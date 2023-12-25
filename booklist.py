@@ -3,14 +3,17 @@ from tkinter import ttk
 from tkinter import messagebox as msg
 import bookdb
 import editbook
+import langpack
 
 class BookList(tk.Toplevel):
-    def __init__(self, parent):
+    def __init__(self, parent, selected_language):
         super().__init__()
         self.db = bookdb.BookManager()
         self.parent = parent
+        self.selected_language = selected_language
+        self.i18n = langpack.I18N(self.selected_language)
         self.geometry("950x300+400+200")
-        self.title("Book Data")
+        self.title("Admin - Book List")
         self.iconbitmap("python.ico")
 
         self.create_widgets()
@@ -23,7 +26,7 @@ class BookList(tk.Toplevel):
             self.tv.insert(parent="", index="end", values=book)
 
     def delete_book(self, event):
-        answer = msg.askyesno(title="Confirm Delete", message="Are you sure you want to delete the selected row(s)?")
+        answer = msg.askyesno(title="Confirm Delete", message=self.i18n.message_confirm_delete)
         if answer:
             for i in self.tv.selection():
                 selected_row = self.tv.item(i)["values"]
@@ -48,7 +51,8 @@ class BookList(tk.Toplevel):
                                                publication_year=selected_book_row[4],
                                                isbn=selected_book_row[5],
                                                status=selected_book_row[6],
-                                               user_id=selected_book_row[7])
+                                               user_id=selected_book_row[7],
+                                               selected_language=self.selected_language)
         self.edit_selected.grab_set()
 
     def create_widgets(self):
@@ -57,13 +61,13 @@ class BookList(tk.Toplevel):
         self.tv.pack(fill="both", expand=True)
 
         self.tv.heading("id", text="ID", anchor="center")
-        self.tv.heading("title", text="Title", anchor="center")
-        self.tv.heading("author", text="Author", anchor="center")
-        self.tv.heading("genre", text="Genre", anchor="center")
-        self.tv.heading("publication_year", text="Publication Year", anchor="center")
+        self.tv.heading("title", text=self.i18n.text_title, anchor="center")
+        self.tv.heading("author", text=self.i18n.text_author, anchor="center")
+        self.tv.heading("genre", text=self.i18n.text_genre, anchor="center")
+        self.tv.heading("publication_year", text=self.i18n.text_publication_year, anchor="center")
         self.tv.heading("isbn", text="ISBN", anchor="center")
-        self.tv.heading("status", text="Status", anchor="center")
-        self.tv.heading("user_id", text="User ID", anchor="center")
+        self.tv.heading("status", text=self.i18n.text_status, anchor="center")
+        self.tv.heading("user_id", text=self.i18n.text_user_id_column, anchor="center")
 
         for col in self.tv["columns"]:
             self.tv.column(col, anchor="w", width=100)

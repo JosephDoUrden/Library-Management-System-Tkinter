@@ -3,12 +3,15 @@ from tkinter import ttk
 from tkinter import messagebox as msg
 import sqlite3
 import bookdb
+import langpack
 
 class EditBook(tk.Toplevel):
-    def __init__(self, parent, rowid, bid, title, author, genre, publication_year, isbn, status, user_id):
+    def __init__(self, parent, rowid, bid, title, author, genre, publication_year, isbn, status, user_id, selected_language):
         super().__init__()
         self.db = bookdb.BookManager()
         self.parent = parent
+        self.selected_language = selected_language
+        self.i18n = langpack.I18N(self.selected_language)
         self.geometry("500x400+400+200")
         self.title(f"Edit - {title}")
         self.iconbitmap("python.ico")
@@ -36,7 +39,7 @@ class EditBook(tk.Toplevel):
             entered_status = self.status.get().strip()
 
             if entered_status not in valid_statuses:
-                msg.showerror(title="Error", message="Please enter a valid status (Issued or Available).")
+                msg.showerror(title="Error", message=self.i18n.message_invalid_status)
                 return
 
             # Update the recorded values in the database.
@@ -63,32 +66,32 @@ class EditBook(tk.Toplevel):
                 self.user_id.get()
             ))
 
-            msg.showinfo("Success", "Book updated.")
+            msg.showinfo("Success", self.i18n.message_save_success_book)
             self.close_window()
         except (tk.TclError, sqlite3.Error) as err:
-            msg.showerror(title="Error", message="Failed to update changes.\n" + str(err))
+            msg.showerror(title="Error", message= self.i18n.message_save_error_book_new + "\n" + str(err))
 
 
     def create_widgets(self):
-        self.lbl_title = ttk.Label(self, text="Title")
+        self.lbl_title = ttk.Label(self, text=self.i18n.text_title)
         self.lbl_title.grid(column=0, row=0, padx=15, pady=15, sticky="w")
 
-        self.lbl_author = ttk.Label(self, text="Author")
+        self.lbl_author = ttk.Label(self, text=self.i18n.text_author)
         self.lbl_author.grid(column=0, row=1, padx=15, pady=(0, 15), sticky="w")
 
-        self.lbl_genre = ttk.Label(self, text="Genre")
+        self.lbl_genre = ttk.Label(self, text=self.i18n.text_genre)
         self.lbl_genre.grid(column=0, row=2, padx=15, pady=(0, 15), sticky="w")
 
-        self.lbl_publication_year = ttk.Label(self, text="Publication Year")
+        self.lbl_publication_year = ttk.Label(self, text=self.i18n.text_publication_year)
         self.lbl_publication_year.grid(column=0, row=3, padx=15, pady=(0, 15), sticky="w")
 
         self.lbl_isbn = ttk.Label(self, text="ISBN")
         self.lbl_isbn.grid(column=0, row=4, padx=15, pady=(0, 15), sticky="w")
 
-        self.lbl_status = ttk.Label(self, text="Status")
+        self.lbl_status = ttk.Label(self, text=self.i18n.text_status)
         self.lbl_status.grid(column=0, row=5, padx=15, pady=(0, 15), sticky="w")
 
-        self.lbl_status = ttk.Label(self, text="Issued By")
+        self.lbl_status = ttk.Label(self, text=self.i18n.text_issued)
         self.lbl_status.grid(column=0, row=6, padx=15, pady=(0, 15), sticky="w")
 
         self.txt_title = ttk.Entry(self, textvariable=self.title, width=35)
@@ -112,7 +115,7 @@ class EditBook(tk.Toplevel):
         self.txt_user_id = ttk.Entry(self, textvariable=self.user_id, width=35)
         self.txt_user_id.grid(column=1, row=6, padx=(0, 15), pady=(0, 15))
 
-        self.btn_update = ttk.Button(self, text="Update Book", command=self.update_values)
+        self.btn_update = ttk.Button(self, text=self.i18n.text_update_book, command=self.update_values)
         self.btn_update.grid(column=0, row=7, columnspan=2, pady=(0, 15), sticky="e")
 
     def close_window(self):

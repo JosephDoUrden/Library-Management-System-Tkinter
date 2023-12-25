@@ -3,13 +3,16 @@ from tkinter import ttk
 from tkinter import messagebox as msg
 import sqlite3
 import dblib
+import langpack
 
 
 class EditUser(tk.Toplevel):
-    def __init__(self, parent, rowid, gid, role, username, password, email, phone):
+    def __init__(self, parent, rowid, gid, role, username, password, email, phone, selected_language):
         super().__init__()
         self.db = dblib.UserDataManager()
         self.parent = parent
+        self.selected_language = selected_language
+        self.i18n = langpack.I18N(self.selected_language)
         self.geometry("400x280+710+290")
         self.title(f"{role} - {username}")
         self.iconbitmap("python.ico")
@@ -36,22 +39,22 @@ class EditUser(tk.Toplevel):
             self.parent.tv.item(self.rowid, values=(self.gid, self.role.get(), self.username.get(), self.password.get(), self.email.get(), self.phone.get()))
             self.close_window()
         except (tk.TclError, sqlite3.Error) as err:
-            msg.showerror(title="Error", message="Failed to update changes.\n" + str(err))
+            msg.showerror(title="Error", message=self.i18n.message_confirm_change_fail + " \n" + str(err))
 
     def create_widgets(self):
-        self.lbl_username = ttk.Label(self, text="Username")
+        self.lbl_username = ttk.Label(self, text=self.i18n.text_username)
         self.lbl_username.grid(column=0, row=0, padx=15, pady=15, sticky="w")
 
-        self.lbl_password = ttk.Label(self, text="Password")
+        self.lbl_password = ttk.Label(self, text=self.i18n.text_password)
         self.lbl_password.grid(column=0, row=1, padx=15, pady=(0, 15), sticky="w")
 
-        self.lbl_role = ttk.Label(self, text="Role")
+        self.lbl_role = ttk.Label(self, text=self.i18n.text_role)
         self.lbl_role.grid(column=0, row=2, padx=15, pady=(0, 15), sticky="w")
 
         self.lbl_email = ttk.Label(self, text="Email")
         self.lbl_email.grid(column=0, row=3, padx=15, pady=(0, 15), sticky="w")
 
-        self.lbl_phone = ttk.Label(self, text="Phone Number")
+        self.lbl_phone = ttk.Label(self, text=self.i18n.text_phone)
         self.lbl_phone.grid(column=0, row=4, padx=15, pady=(0, 15), sticky="w")
 
         self.txt_username = ttk.Entry(self, textvariable=self.username, width=35)
@@ -69,7 +72,7 @@ class EditUser(tk.Toplevel):
         self.txt_phone = ttk.Entry(self, textvariable=self.phone, width=35)
         self.txt_phone.grid(column=1, row=4, padx=(0, 15), pady=(0, 15))
 
-        self.btn_update = ttk.Button(self, text="Update", command=self.update_values)
+        self.btn_update = ttk.Button(self, text=self.i18n.text_update_user, command=self.update_values)
         self.btn_update.grid(column=0, row=5, columnspan=2, pady=(0, 15), sticky="e")
 
     def close_window(self):

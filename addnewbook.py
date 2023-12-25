@@ -4,15 +4,18 @@ from tkinter import messagebox as msg
 import sqlite3
 import bookdb
 import datetime
+import langpack
 
 
 class AddNewBook(tk.Toplevel):
-    def __init__(self, parent):
+    def __init__(self, parent, selected_language):
         super().__init__()
         self.db = bookdb.BookManager()
         self.parent = parent
+        self.selected_language = selected_language
+        self.i18n = langpack.I18N(self.selected_language)
         self.geometry("400x300+710+200")
-        self.title("Add New Book")
+        self.title("Admin - " + self.i18n.text_add_new_button_book)
         self.iconbitmap("python.ico")
 
         self.title = tk.StringVar()
@@ -46,24 +49,24 @@ class AddNewBook(tk.Toplevel):
 
         try:
             if len(self.title.get()) == 0:
-                msg.showerror(title="Error", message="Please enter a valid title.")
+                msg.showerror(title="Error", message=self.i18n.message_title_error)
             elif len(self.author.get()) == 0:
-                msg.showerror(title="Error", message="Please enter a valid author.")
+                msg.showerror(title="Error", message=self.i18n.message_author_error)
             elif len(self.genre.get()) == 0:
-                msg.showerror(title="Error", message="Please enter a valid genre.")
+                msg.showerror(title="Error", message=self.i18n.message_genre_error)
             elif isinstance(self.publication_year.get(), str) or int(self.publication_year.get()) > year or int(self.publication_year.get()) < 0:
-                msg.showerror(title="Error", message="Please enter a valid publication year.")
+                msg.showerror(title="Error", message=self.i18n.message_publication_year_error)
             elif not self.is_valid_isbn_13(self.isbn.get()):
-                msg.showerror(title="Error", message="Please enter a valid ISBN.")
+                msg.showerror(title="Error", message=self.i18n.message_isbn_error)
             elif len(self.status.get()) == 0 and (self.status.get() != "Issued" or self.status.get() != "Available"):
-                msg.showerror(title="Error", message="Please enter a valid status.")
+                msg.showerror(title="Error", message=self.i18n.message_status_error)
             else:
                 self.db.add_book(title=self.title.get(), author=self.author.get(), genre=self.genre.get(), publication_year=self.publication_year.get(), isbn=self.isbn.get(), status=self.status.get())
-                msg.showinfo("Done", "Book saved.")
+                msg.showinfo("Done", self.i18n.message_save_success_book)
                 self.clear_text_boxes()
                 self.txt_title.focus_set()
         except (tk.TclError, sqlite3.Error) as err:
-            msg.showerror(title="Error", message="Failed to save new book.\n" + str(err))
+            msg.showerror(title="Error", message=self.i18n.message_save_error_book + "\n" + str(err))
 
     def clear_text_boxes(self):
         self.txt_title.delete(0, "end")
@@ -74,26 +77,23 @@ class AddNewBook(tk.Toplevel):
         self.txt_status.delete(0, "end")
 
     def create_widgets(self):
-        self.lbl_title = ttk.Label(self, text="Title")
+        self.lbl_title = ttk.Label(self, text=self.i18n.text_title)
         self.lbl_title.grid(column=0, row=0, padx=15, pady=15, sticky="w")
 
-        self.lbl_author = ttk.Label(self, text="Author")
+        self.lbl_author = ttk.Label(self, text=self.i18n.text_author)
         self.lbl_author.grid(column=0, row=1, padx=15, pady=(0, 15), sticky="w")
 
-        self.lbl_genre = ttk.Label(self, text="Genre")
+        self.lbl_genre = ttk.Label(self, text=self.i18n.text_genre)
         self.lbl_genre.grid(column=0, row=2, padx=15, pady=(0, 15), sticky="w")
 
-        self.lbl_publication_year = ttk.Label(self, text="Publication Year")
+        self.lbl_publication_year = ttk.Label(self, text=self.i18n.text_publication_year)
         self.lbl_publication_year.grid(column=0, row=3, padx=15, pady=(0, 15), sticky="w")
 
         self.lbl_isbn = ttk.Label(self, text="ISBN")
         self.lbl_isbn.grid(column=0, row=4, padx=15, pady=(0, 15), sticky="w")
 
-        self.lbl_available_copies = ttk.Label(self, text="Available Copies")
-        self.lbl_available_copies.grid(column=0, row=5, padx=15, pady=(0, 15), sticky="w")
-
-        self.lbl_total_copies = ttk.Label(self, text="Total Copies")
-        self.lbl_total_copies.grid(column=0, row=6, padx=15, pady=(0, 15), sticky="w")
+        self.lbl_isbn = ttk.Label(self, text=self.i18n.text_status)
+        self.lbl_isbn.grid(column=0, row=5, padx=15, pady=(0, 15), sticky="w")
 
         self.txt_title = ttk.Entry(self, textvariable=self.title, width=35)
         self.txt_title.grid(column=1, row=0, padx=(0, 15), pady=15)

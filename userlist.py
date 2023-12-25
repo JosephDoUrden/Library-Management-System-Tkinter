@@ -3,13 +3,16 @@ from tkinter import ttk
 from tkinter import messagebox as msg
 import dblib
 import edituser
+import langpack
 
 
 class UserList(tk.Toplevel):
-    def __init__(self, parent):
+    def __init__(self, parent, selected_language):
         super().__init__()
         self.db = dblib.UserDataManager()
         self.parent = parent
+        self.selected_language = selected_language
+        self.i18n = langpack.I18N(self.selected_language)
         self.geometry("600x200+710+290")
         self.title("User List")
         self.iconbitmap("python.ico")
@@ -24,7 +27,7 @@ class UserList(tk.Toplevel):
             self.tv.insert(parent="", index="end", values=g)
 
     def delete_user(self, event):
-        answer = msg.askyesno(title="Confirm Delete", message="Are you sure you want to delete the selected row(s)?")
+        answer = msg.askyesno(title="Confirm Delete", message=self.i18n.message_confirm_delete)
         if answer:
             for i in self.tv.selection():
                 selected_row = self.tv.item(i)["values"]
@@ -47,7 +50,8 @@ class UserList(tk.Toplevel):
                                                  username=selected_user_row[2],
                                                  password=selected_user_row[3],                                                 
                                                  email=selected_user_row[4],
-                                                 phone=selected_user_row[5])
+                                                 phone=selected_user_row[5],
+                                                 selected_language=self.selected_language)
         self.edit_selected.grab_set()
 
     def create_widgets(self):
@@ -59,11 +63,11 @@ class UserList(tk.Toplevel):
 
         # Add headings for each column.
         self.tv.heading("id", text="ID", anchor="center")
-        self.tv.heading("role", text="Role", anchor="center")
-        self.tv.heading("username", text="Userame", anchor="center")
-        self.tv.heading("password", text="Password", anchor="center")
+        self.tv.heading("role", text=self.i18n.text_role, anchor="center")
+        self.tv.heading("username", text=self.i18n.text_username, anchor="center")
+        self.tv.heading("password", text=self.i18n.text_password, anchor="center")
         self.tv.heading("email", text="Email", anchor="center")
-        self.tv.heading("phone", text="Phone", anchor="center")
+        self.tv.heading("phone", text=self.i18n.text_phone, anchor="center")
 
         # Configure each column.
         self.tv.column("id", anchor="w", width=45, stretch="no")

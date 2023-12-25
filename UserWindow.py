@@ -4,12 +4,15 @@ from tkinter import messagebox as msg
 import ChangePasswordWindow
 import dblib
 import bookdb
+import langpack
 
 class UserWindow(tk.Toplevel):
-    def __init__(self, parent, shared_var):
+    def __init__(self, parent, shared_var, selected_language):
         super().__init__()
         self.parent = parent
-        self.title("User")
+        self.selected_language = selected_language
+        self.i18n = langpack.I18N(self.selected_language)
+        self.title("LMS - Library Management System")
         self.geometry("700x300+710+200")
         self.iconbitmap("python.ico")
 
@@ -31,9 +34,9 @@ class UserWindow(tk.Toplevel):
         tab2 = ttk.Frame(self.tabControl) 
         tab3 = ttk.Frame(self.tabControl) 
   
-        self.tabControl.add(tab1, text ='Library') 
-        self.tabControl.add(tab2, text ='My Books') 
-        self.tabControl.add(tab3, text ='Profile')
+        self.tabControl.add(tab1, text=self.i18n.text_library_tab) 
+        self.tabControl.add(tab2, text=self.i18n.text_my_books_tab) 
+        self.tabControl.add(tab3, text=self.i18n.text_profile_tab)
 
         # Widgets for Library
         self.library = ttk.Treeview(tab1)
@@ -51,12 +54,12 @@ class UserWindow(tk.Toplevel):
 
         self.library.heading("#0",text="",anchor='center')
         self.library.heading("id",text="Id",anchor='center')
-        self.library.heading("title",text="Title",anchor='center')
-        self.library.heading("author",text="Author",anchor='center')
-        self.library.heading("genre",text="Genre",anchor='center')
-        self.library.heading("publication_year",text="Publication Year",anchor='center')        
+        self.library.heading("title",text=self.i18n.text_title,anchor='center')
+        self.library.heading("author",text=self.i18n.text_author,anchor='center')
+        self.library.heading("genre",text=self.i18n.text_genre,anchor='center')
+        self.library.heading("publication_year",text=self.i18n.text_publication_year,anchor='center')        
         self.library.heading("isbn",text="ISBN",anchor='center')
-        self.library.heading("status",text="Status",anchor='center')
+        self.library.heading("status",text=self.i18n.text_status,anchor='center')
 
         for book in self.bookdb.list_books():
             self.library.insert(parent="", index="end", values=book)
@@ -84,12 +87,12 @@ class UserWindow(tk.Toplevel):
 
         self.my_books.heading("#0",text="",anchor='center')
         self.my_books.heading("id",text="Id",anchor='center')
-        self.my_books.heading("title",text="Title",anchor='center')
-        self.my_books.heading("author",text="Author",anchor='center')
-        self.my_books.heading("genre",text="Genre",anchor='center')
-        self.my_books.heading("publication_year",text="Publication Year",anchor='center')        
+        self.my_books.heading("title",text=self.i18n.text_title,anchor='center')
+        self.my_books.heading("author",text=self.i18n.text_author,anchor='center')
+        self.my_books.heading("genre",text=self.i18n.text_genre,anchor='center')
+        self.my_books.heading("publication_year",text=self.i18n.text_publication_year,anchor='center')        
         self.my_books.heading("isbn",text="ISBN",anchor='center')
-        self.my_books.heading("status",text="Status",anchor='center')
+        self.my_books.heading("status",text=self.i18n.text_status,anchor='center')
 
         for book in self.bookdb.get_my_books(self.current_user[0]):
             self.my_books.insert(parent="", index="end", values=book)
@@ -109,12 +112,12 @@ class UserWindow(tk.Toplevel):
         data_phone = tk.StringVar()
         data_book_count = tk.StringVar()
 
-        profile_username = ttk.Label(tab3, text="Username: " + self.current_user[2])
-        profile_role  = ttk.Label(tab3, text="Role: " + str(self.current_user[1]))
-        profile_email = ttk.Label(tab3, text="Email: " + self.current_user[4])
-        profile_phone = ttk.Label(tab3, text="Phone Number: " + str(self.current_user[5]))
+        profile_username = ttk.Label(tab3, text=self.i18n.text_username + ": " + self.current_user[2])
+        profile_role  = ttk.Label(tab3, text=self.i18n.text_role + ": "  + str(self.current_user[1]))
+        profile_email = ttk.Label(tab3, text=self.i18n.text_email + ": "  + self.current_user[4])
+        profile_phone = ttk.Label(tab3, text=self.i18n.text_phone + ": "  + str(self.current_user[5]))
         
-        self.change_password_btn = ttk.Button(tab3, text="Change Password", command=self.change_password)
+        self.change_password_btn = ttk.Button(tab3, text=self.i18n.title_change_password, command=self.change_password)
         self.change_password_btn.grid(column=0, row=5, padx = 15, pady=10, columnspan=2, sticky="w")  # Align to the left
 
         profile_username.grid(column = 0, row = 0, padx = 15, pady = 10, sticky="w")
@@ -125,7 +128,7 @@ class UserWindow(tk.Toplevel):
         self.tabControl.pack(expand = 1, fill ="both") 
 
     def borrow_book(self, event):
-        answer = msg.askyesno(title="Confirm Borrow", message="Are you sure you want to borrow the selected book(s)?")
+        answer = msg.askyesno(title=self.i18n.text_confirm_borrow, message=self.i18n.message_confirm_borrow)
         if answer:
             for i in self.library.selection():
                 selected_row = self.library.item(i)["values"]
@@ -134,7 +137,7 @@ class UserWindow(tk.Toplevel):
             self.refresh_my_books()
 
     def return_book(self, event):
-        answer = msg.askyesno(title="Confirm Return", message="Are you sure you want to return the selected book(s)?")
+        answer = msg.askyesno(title=self.i18n.text_confirm_return, message=self.i18n.message_confirm_return)
         if answer:
             for i in self.my_books.selection():
                 selected_row = self.my_books.item(i)["values"]
@@ -146,7 +149,7 @@ class UserWindow(tk.Toplevel):
         return dblib.UserDataManager().user_detail(self.shared_var)
     
     def change_password(self):
-        self.win3 = ChangePasswordWindow.ChangePasswordWindow(self, self.current_user[2])
+        self.win3 = ChangePasswordWindow.ChangePasswordWindow(self, self.current_user[2], self.selected_language)
 
     def refresh_library(self):
         # Refresh the content of the Library tab
