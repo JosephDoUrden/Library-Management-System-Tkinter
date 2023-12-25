@@ -99,7 +99,6 @@ class BookManager:
                          [title, author, genre, publication_year, isbn, status, user_id, bid-1])
         self.conn.commit()
     
-    #TODO update 
     def book_detail(self, bid):
         self.conn = self.get_connection()
         self.cur = self.conn.cursor()
