@@ -24,6 +24,7 @@ class AddNewBook(tk.Toplevel):
         self.publication_year = tk.IntVar()
         self.isbn = tk.StringVar()
         self.status = tk.StringVar()
+        self.user_id = tk.IntVar()
 
         self.create_widgets()
         self.bind_widgets()
@@ -61,7 +62,7 @@ class AddNewBook(tk.Toplevel):
             elif len(self.status.get()) == 0 and (self.status.get() != "Issued" or self.status.get() != "Available"):
                 msg.showerror(title="Error", message=self.i18n.message_status_error)
             else:
-                self.db.add_book(title=self.title.get(), author=self.author.get(), genre=self.genre.get(), publication_year=self.publication_year.get(), isbn=self.isbn.get(), status=self.status.get())
+                self.db.add_book(title=self.title.get(), author=self.author.get(), genre=self.genre.get(), publication_year=self.publication_year.get(), isbn=self.isbn.get(), status=self.status.get(), user_id=self.user_id.get())
                 msg.showinfo("Done", self.i18n.message_save_success_book)
                 self.clear_text_boxes()
                 self.txt_title.focus_set()

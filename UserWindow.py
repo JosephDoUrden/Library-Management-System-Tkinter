@@ -128,7 +128,7 @@ class UserWindow(tk.Toplevel):
         self.tabControl.pack(expand = 1, fill ="both") 
 
     def borrow_book(self, event):
-        answer = msg.askyesno(title=self.i18n.text_confirm_borrow, message=self.i18n.message_confirm_borrow)
+        answer = msg.askyesno(title=self.i18n.message_confirm_borrow, message=self.i18n.message_confirm_borrow)
         if answer:
             for i in self.library.selection():
                 selected_row = self.library.item(i)["values"]
@@ -137,7 +137,7 @@ class UserWindow(tk.Toplevel):
             self.refresh_my_books()
 
     def return_book(self, event):
-        answer = msg.askyesno(title=self.i18n.text_confirm_return, message=self.i18n.message_confirm_return)
+        answer = msg.askyesno(title=self.i18n.message_confirm_return, message=self.i18n.message_confirm_return)
         if answer:
             for i in self.my_books.selection():
                 selected_row = self.my_books.item(i)["values"]
