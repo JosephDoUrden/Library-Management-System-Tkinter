@@ -24,7 +24,7 @@ class EditBook(tk.Toplevel):
         self.publication_year = tk.IntVar(value=publication_year)
         self.isbn = tk.StringVar(value=isbn)
         self.status = tk.StringVar(value=status)
-        self.user_id = tk.IntVar(value=user_id)
+        self.user_id = -1 if user_id is None else user_id
 
         self.rowid = rowid  # ID of the Treeview item that is currently being edited.
 
@@ -51,7 +51,7 @@ class EditBook(tk.Toplevel):
                 publication_year=self.publication_year.get(),
                 isbn=self.isbn.get(),
                 status=entered_status,
-                user_id=self.user_id.get()
+                user_id=self.user_id
             )
 
             # Update the values of the selected Treeview row that is in the parent window.
@@ -63,7 +63,7 @@ class EditBook(tk.Toplevel):
                 self.publication_year.get(),
                 self.isbn.get(),
                 entered_status,
-                self.user_id.get()
+                self.user_id
             ))
 
             msg.showinfo("Success", self.i18n.message_save_success_book)

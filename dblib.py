@@ -14,7 +14,7 @@ class UserDataManager:
         self.cur = self.conn.cursor()
         self.cur.execute("""
         create table UserData (
-            id   integer primary key autoincrement,
+            uid integer primary key autoincrement,
             role text NOT NULL,
             username text NOT NULL,
             password text NOT NULL,
@@ -67,18 +67,19 @@ class UserDataManager:
         self.conn.close()
         return users
 
-    def delete_user(self, gid):
+    def delete_user(self, id):
         self.conn = self.get_connection()
         self.cur = self.conn.cursor()
-        self.cur.execute("delete from UserData where id=?", [id])
+        self.cur.execute("delete from UserData where uid=?", [id])
         self.conn.commit()
 
     def edit_user(self, id, role, username, password, email, phone):
         self.conn = self.get_connection()
         self.cur = self.conn.cursor()
-        self.cur.execute("update UserData set role=?, username=?, password=?, email=?, phone=? where id=?",
-                         [role, username, password, email, phone, id])
+        self.cur.execute("UPDATE UserData SET role=?, username=?, password=?, email=?, phone=? WHERE uid=?",
+                        [role, username, password, email, phone, id])
         self.conn.commit()
+
     
     def user_check(self, uname, password):
         self.conn = self.get_connection()

@@ -37,32 +37,32 @@ class AdminUserWindow(tk.Toplevel):
     def create_db(self):
         try:
             self.db.create_database()
-            msg.showinfo(title=self.title, message=self.i18n.message_database_create_success)
+            msg.showinfo(title="Database", message=self.i18n.message_database_create_success)
         except sqlite3.Error as err:
-            msg.showerror(title=self.title, message=self.i18n.message_database_create_error + "\n" + str(err))
+            msg.showerror(title="Database", message=self.i18n.message_database_create_error + "\n" + str(err))
 
     def fill_db(self):
         try:
             self.db.fill_database()
-            msg.showinfo(title=self.title, message=self.i18n.message_database_fill_success)
+            msg.showinfo(title="Database", message=self.i18n.message_database_fill_success)
         except sqlite3.Error as err:
-            msg.showerror(title=self.title, message=self.i18n.message_database_fill_error + "\n" + str(err))
+            msg.showerror(title="Database", message=self.i18n.message_database_fill_error + "\n" + str(err))
 
     def clear_db(self):
         try:
             self.db.clear_database()
-            msg.showinfo(title=self.title, message=self.i18n.message_database_clear_success)
+            msg.showinfo(title="Database", message=self.i18n.message_database_clear_success)
         except sqlite3.Error as err:
-            msg.showerror(title=self.title, message=self.i18n.message_database_clear_error + "\n" + str(err))
+            msg.showerror(title="Database", message=self.i18n.message_database_clear_error + "\n" + str(err))
 
     def show_add_new_window(self):
         self.withdraw()
-        self.add_new = addnew.AddNew(self, self.selected_language)  # Fix: Place positional argument before keyword argument
+        self.add_new = addnew.AddNew(self, self.selected_language)  
         self.add_new.grab_set()
 
     def show_user_list_window(self):
         self.withdraw()
-        self.user_list = userlist.UserList(self, self.selected_language)  # Fix: Remove unnecessary keyword argument
+        self.user_list = userlist.UserList(self, self.selected_language) 
         self.user_list.grab_set()
 
     def close_window(self):

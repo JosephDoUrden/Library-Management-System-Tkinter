@@ -85,7 +85,7 @@ class MainWindow:
 
             self.win2.grab_set()
         else:
-            msg.showerror(title=self.i18n.message_error, message=self.i18n.message_error_text)
+            msg.showerror(title="Error", message=self.i18n.message_error_text)
 
 app = MainWindow()
 app.win.mainloop()

@@ -7,7 +7,7 @@ import langpack
 
 
 class EditUser(tk.Toplevel):
-    def __init__(self, parent, rowid, gid, role, username, password, email, phone, selected_language):
+    def __init__(self, parent, rowid, id, role, username, password, email, phone, selected_language):
         super().__init__()
         self.db = dblib.UserDataManager()
         self.parent = parent
@@ -23,9 +23,8 @@ class EditUser(tk.Toplevel):
         self.role = tk.StringVar(value=role)
         self.email = tk.StringVar(value=email)
         self.phone = tk.IntVar(value=phone)
-
-        self.gid = gid
-        self.rowid = rowid  # ID of the Treeview item that is currently being edited.
+        self.id = id
+        self.rowid = rowid
 
         self.create_widgets()
         self.txt_username.focus_set()
@@ -34,9 +33,26 @@ class EditUser(tk.Toplevel):
     def update_values(self):
         try:
             # Update the recorded values in the database.
-            self.db.edit_user(gid=self.gid, role=self.role.get(), username=self.username.get(), password=self.password.get(), email=self.email.get(), phone=self.phone.get())
+            self.db.edit_user(
+                id=self.id, 
+                role=self.role.get(), 
+                username=self.username.get(), 
+                password=self.password.get(), 
+                email=self.email.get(), 
+                phone=self.phone.get()
+            )
+            
             # Update the values of the selected Treeview row that is in the parent window.
-            self.parent.tv.item(self.rowid, values=(self.gid, self.role.get(), self.username.get(), self.password.get(), self.email.get(), self.phone.get()))
+            self.parent.tv.item(self.rowid, values=(
+                self.id, 
+                self.role.get(), 
+                self.username.get(), 
+                self.password.get(), 
+                self.email.get(), 
+                self.phone.get())
+            )
+
+            msg.showinfo("Success", self.i18n.message_save_success_user)
             self.close_window()
         except (tk.TclError, sqlite3.Error) as err:
             msg.showerror(title="Error", message=self.i18n.message_confirm_change_fail + " \n" + str(err))

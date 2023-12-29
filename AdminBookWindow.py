@@ -37,23 +37,23 @@ class AdminBookWindow(tk.Toplevel):
     def create_db(self):
         try:
             self.db.create_database()
-            msg.showinfo(title=self.title, message=self.i18n.message_database_create_success)
+            msg.showinfo(title="Database", message=self.i18n.message_database_create_success)
         except sqlite3.Error as err:
-            msg.showerror(title=self.title, message=self.i18n.message_database_create_error + "\n" + str(err))
+            msg.showerror(title="Database", message=self.i18n.message_database_create_error + "\n" + str(err))
 
     def fill_db(self):
         try:
             self.db.fill_database()
-            msg.showinfo(title=self.title, message=self.i18n.message_database_fill_success)
+            msg.showinfo(title="Database", message=self.i18n.message_database_fill_success)
         except sqlite3.Error as err:
-            msg.showerror(title=self.title, message=self.i18n.message_database_fill_error + "\n" + str(err))
+            msg.showerror(title="Database", message=self.i18n.message_database_fill_error + "\n" + str(err))
 
     def clear_db(self):
         try:
             self.db.clear_database()
-            msg.showinfo(title=self.title, message=self.i18n.message_database_clear_success)
+            msg.showinfo(title="Database", message=self.i18n.message_database_clear_success)
         except sqlite3.Error as err:
-            msg.showerror(title=self.title, message=self.i18n.message_database_clear_error + "\n" + str(err))
+            msg.showerror(title="Database", message=self.i18n.message_database_clear_error + "\n" + str(err))
 
     def show_add_new_window(self):
         self.withdraw()

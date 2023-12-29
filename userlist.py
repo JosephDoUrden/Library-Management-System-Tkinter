@@ -43,16 +43,19 @@ class UserList(tk.Toplevel):
 
         selected_row_id = self.tv.selection()[0]
         selected_user_row = self.tv.item(selected_row_id)["values"]
+
+        # Pass the correct parameters to EditUser
         self.edit_selected = edituser.EditUser(parent=self,
-                                                 rowid=selected_row_id,
-                                                 gid=selected_user_row[0],
-                                                 role=selected_user_row[1],
-                                                 username=selected_user_row[2],
-                                                 password=selected_user_row[3],                                                 
-                                                 email=selected_user_row[4],
-                                                 phone=selected_user_row[5],
-                                                 selected_language=self.selected_language)
+                                                rowid=selected_row_id,
+                                                id=selected_user_row[0],
+                                                role=selected_user_row[1],
+                                                username=selected_user_row[2],
+                                                password=selected_user_row[3],
+                                                email=selected_user_row[4],
+                                                phone=selected_user_row[5],
+                                                selected_language=self.selected_language)
         self.edit_selected.grab_set()
+
 
     def create_widgets(self):
         # Create a Treeview widget.
